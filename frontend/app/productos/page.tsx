@@ -1,121 +1,161 @@
-'use client'
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { productosApi } from '@/lib/api'
-import type { Producto } from '@/types'
+'use client';
 
-const CATEGORIAS = ['TODAS', 'PINTURA', 'BARNIZ', 'MOLDURA', 'ACCESORIO', 'MADERA', 'HERRAMIENTA']
-
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n)
-}
+import PageHeader from '@/components/PageHeader';
+import Card from '@/components/Card';
+import Button from '@/components/Button';
+import Badge from '@/components/Badge';
+import Input from '@/components/Input';
+import Select from '@/components/Select';
+import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ProductosPage() {
-  const [productos, setProductos] = useState<Producto[]>([])
-  const [filtro, setFiltro] = useState('TODAS')
-  const [busqueda, setBusqueda] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('todos');
 
-  useEffect(() => {
-    productosApi.listar()
-      .then(setProductos)
-      .catch(() => setError('No se pudieron cargar los productos.'))
-      .finally(() => setLoading(false))
-  }, [])
+  const products = [
+    {
+      id: 1,
+      name: 'Producto Premium A',
+      category: 'electrónica',
+      price: '$299.99',
+      stock: 45,
+      rating: 4.5,
+    },
+    {
+      id: 2,
+      name: 'Producto Estándar B',
+      category: 'accesorios',
+      price: '$149.99',
+      stock: 120,
+      rating: 4.2,
+    },
+    {
+      id: 3,
+      name: 'Producto Plus C',
+      category: 'software',
+      price: '$199.99',
+      stock: 30,
+      rating: 4.8,
+    },
+    {
+      id: 4,
+      name: 'Producto Básico D',
+      category: 'electrónica',
+      price: '$99.99',
+      stock: 5,
+      rating: 3.9,
+    },
+    {
+      id: 5,
+      name: 'Producto Deluxe E',
+      category: 'accesorios',
+      price: '$349.99',
+      stock: 18,
+      rating: 4.7,
+    },
+    {
+      id: 6,
+      name: 'Producto Bundle F',
+      category: 'software',
+      price: '$249.99',
+      stock: 60,
+      rating: 4.3,
+    },
+  ];
 
-  const handleEliminar = async (id: string) => {
-    if (!confirm('¿Deshabilitar este producto?')) return
-    await productosApi.eliminar(id)
-    setProductos(prev => prev.filter(p => p.id !== id))
-  }
+  const getStockBadge = (stock: number) => {
+    if (stock > 50) return 'success';
+    if (stock > 20) return 'warning';
+    return 'error';
+  };
 
-  const filtrados = productos.filter(p => {
-    const matchCat = filtro === 'TODAS' || p.categoria === filtro
-    const matchBusq = !busqueda || p.nombre.toLowerCase().includes(busqueda.toLowerCase())
-    return matchCat && matchBusq
-  })
+  const getStockLabel = (stock: number) => {
+    if (stock > 50) return 'Stock Alto';
+    if (stock > 20) return 'Stock Medio';
+    return 'Stock Bajo';
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === 'todos' || product.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Productos</h1>
-          <p className="page-subtitle">{productos.length} productos activos</p>
-        </div>
-        <Link href="/productos/nuevo" className="btn btn-primary">+ Nuevo producto</Link>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Catálogo de Productos"
+        subtitle="Explora nuestro catálogo completo"
+        action={
+          <Link href="/cotizaciones/nueva">
+            <Button>+ Nueva Cotización</Button>
+          </Link>
+        }
+      />
 
-      <div className="card">
-        <div className="card-body" style={{ paddingBottom: 0 }}>
-          <input
-            className="form-input"
-            placeholder="Buscar por nombre..."
-            value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
-            style={{ maxWidth: 280, marginBottom: '1rem' }}
+      {/* Filters */}
+      <Card className="p-6">
+        <h3 className="font-semibold text-gray-900 mb-4">Filtros</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Buscar producto"
+            placeholder="Nombre del producto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div className="filters">
-            {CATEGORIAS.map(c => (
-              <button
-                key={c}
-                className={`filter-btn ${filtro === c ? 'active' : ''}`}
-                onClick={() => setFiltro(c)}
-              >
-                {c === 'TODAS' ? 'Todas' : c.charAt(0) + c.slice(1).toLowerCase()}
-              </button>
-            ))}
-          </div>
+          <Select
+            label="Categoría"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="todos">Todos</option>
+            <option value="electrónica">Electrónica</option>
+            <option value="accesorios">Accesorios</option>
+            <option value="software">Software</option>
+          </Select>
         </div>
+      </Card>
 
-        {error && <div className="error-msg" style={{ margin: '0 1.25rem 1rem' }}>{error}</div>}
+      {/* Products Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <Card key={product.id} variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
+                  <Badge variant={getStockBadge(product.stock)}>
+                    {getStockLabel(product.stock)}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-3 mb-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">
+                    {product.category}
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-primary-600">{product.price}</span>
+                    <span className="text-sm text-gray-500">por unidad</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-medium text-gray-700">
+                      ⭐ {product.rating}
+                    </span>
+                    <span className="text-xs text-gray-500">({product.stock} disponibles)</span>
+                  </div>
+                </div>
 
-        {loading ? (
-          <div className="loading">Cargando...</div>
-        ) : filtrados.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">📦</div>
-            <p>No hay productos registrados.</p>
-          </div>
+                <Button className="w-full">Agregar a Cotización</Button>
+              </div>
+            </Card>
+          ))
         ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Categoría</th>
-                  <th>Unidad</th>
-                  <th style={{ textAlign: 'right' }}>Precio</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtrados.map(p => (
-                  <tr key={p.id}>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{p.nombre}</div>
-                      {p.descripcion && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{p.descripcion}</div>}
-                    </td>
-                    <td>
-                      {p.categoria
-                        ? <span className="badge" style={{ background: 'var(--blue-50)', color: 'var(--blue-600)' }}>{p.categoria}</span>
-                        : <span style={{ color: 'var(--text-muted)' }}>—</span>}
-                    </td>
-                    <td style={{ color: 'var(--text-muted)' }}>{p.unidad || '—'}</td>
-                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(Number(p.precio))}</td>
-                    <td>
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        <Link href={`/productos/${p.id}`} className="btn btn-outline btn-sm">Editar</Link>
-                        <button className="btn btn-danger btn-sm" onClick={() => handleEliminar(p.id)}>Deshabilitar</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-500 text-lg">No se encontraron productos</p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
