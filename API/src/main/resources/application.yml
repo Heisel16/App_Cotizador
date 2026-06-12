@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: API
+  data:
+    mongodb:
+      auto-index-creation: true
+  mongodb:
+    uri: mongodb+srv://heisselsanchez_db_user:heisel1590p@cluster0.l0m4fpj.mongodb.net/ornamentacion_db?retryWrites=true&w=majority&appName=Cluster0
+
+logging:
+  level:
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.web: DEBUG
+    com.example.API: DEBUG
