@@ -7,11 +7,11 @@ import type { Cotizacion, EstadoCotizacion } from '@/types'
 
 const ESTADOS: EstadoCotizacion[] = ['PENDIENTE', 'APROBADA', 'RECHAZADA', 'COMPLETADA']
 
-const badgeStyle: Record<string, { background: string; color: string }> = {
-  PENDIENTE:  { background: '#fffbeb', color: '#d97706' },
-  APROBADA:   { background: '#f0fdf4', color: '#16a34a' },
-  RECHAZADA:  { background: '#fef2f2', color: '#dc2626' },
-  COMPLETADA: { background: '#eff6ff', color: '#2563eb' },
+const badgeClass: Record<string, string> = {
+  PENDIENTE: 'badge-pendiente',
+  APROBADA: 'badge-aprobada',
+  RECHAZADA: 'badge-rechazada',
+  COMPLETADA: 'badge-completada',
 }
 
 function formatCurrency(n: number) {
@@ -56,69 +56,116 @@ export default function CotizacionDetallePage() {
     router.push('/cotizaciones')
   }
 
-  if (loading) return <div style={{ textAlign: 'center', padding: '3rem', color: '#718096' }}>Cargando...</div>
-  if (error || !cotizacion) return <div style={{ background: '#fef2f2', color: '#dc2626', padding: '0.75rem 1rem', borderRadius: 8, maxWidth: 600, fontSize: 13 }}>{error || 'Cotización no encontrada.'}</div>
+  if (loading) return <div className="loading">Cargando...</div>
+  if (error || !cotizacion) return <div className="error-msg" style={{ maxWidth: 600 }}>{error || 'Cotización no encontrada.'}</div>
 
   return (
     <div style={{ maxWidth: 720 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div className="page-header">
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 600 }}>{cotizacion.cliente}</h1>
-          <p style={{ fontSize: 13, color: '#718096', marginTop: 2 }}>Creada el {formatDate(cotizacion.fechaCreacion)}</p>
+          <h1 className="page-title">{cotizacion.cliente}</h1>
+          <p className="page-subtitle">Creada el {formatDate(cotizacion.fechaCreacion)}</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/cotizaciones" style={{ padding: '0.5rem 1rem', border: '1px solid #e2e8f0', borderRadius: 8, textDecoration: 'none', fontSize: 14, color: '#1a202c' }}>← Volver</Link>
-          <button onClick={handleEliminar} style={{ padding: '0.5rem 1rem', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 14, cursor: 'pointer', background: 'white', color: '#dc2626' }}>Eliminar</button>
+          <Link href="/cotizaciones" className="btn btn-outline">← Volver</Link>
+          <button className="btn btn-danger" onClick={handleEliminar}>Eliminar</button>
         </div>
       </div>
 
-      {error && <div style={{ background: '#fef2f2', color: '#dc2626', padding: '0.75rem 1rem', borderRadius: 8, marginBottom: '1rem', fontSize: 13 }}>{error}</div>}
+      {error && <div className="error-msg">{error}</div>}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.25rem' }}>
-          <div style={{ fontSize: 12, color: '#718096', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Cliente</div>
-          <div style={{ fontWeight: 600, fontSize: 16 }}>{cotizacion.cliente}</div>
-          {cotizacion.telefono && <div style={{ color: '#718096', marginTop: 4, fontSize: 14 }}>📞 {cotizacion.telefono}</div>}
+      {/* Info cliente y estado */}
+      <div className="grid-2" style={{ marginBottom: '1.25rem' }}>
+        <div className="card">
+          <div className="card-body">
+            <p className="section-title">Cliente</p>
+            <div style={{ fontWeight: 600, fontSize: 16 }}>{cotizacion.cliente}</div>
+            {cotizacion.telefono && (
+              <div style={{ color: 'var(--text-muted)', marginTop: 6, fontSize: 14 }}>📞 {cotizacion.telefono}</div>
+            )}
+          </div>
         </div>
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.25rem' }}>
-          <div style={{ fontSize: 12, color: '#718096', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Estado</div>
-          <span style={{ ...badgeStyle[cotizacion.estado], padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 500 }}>{cotizacion.estado}</span>
-          <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
-            {ESTADOS.filter(e => e !== cotizacion.estado).map(e => (
-              <button key={e} onClick={() => cambiarEstado(e)} disabled={updatingEstado} style={{ padding: '0.35rem 0.75rem', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, cursor: 'pointer', background: 'white', color: '#1a202c' }}>
-                → {e}
-              </button>
-            ))}
+
+        <div className="card">
+          <div className="card-body">
+            <p className="section-title">Estado</p>
+            <span className={`badge ${badgeClass[cotizacion.estado]}`} style={{ fontSize: 13, padding: '4px 12px' }}>
+              {cotizacion.estado}
+            </span>
+            <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
+              {ESTADOS.filter(e => e !== cotizacion.estado).map(e => (
+                <button
+                  key={e}
+                  className="btn btn-outline btn-sm"
+                  onClick={() => cambiarEstado(e)}
+                  disabled={updatingEstado}
+                >
+                  → {e}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12 }}>
-        <div style={{ padding: '1.25rem', borderBottom: '1px solid #e2e8f0' }}>
-          <h2 style={{ fontSize: 13, fontWeight: 600, color: '#718096', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Productos</h2>
+      {/* Tabla productos desktop */}
+      <div className="card desktop-only">
+        <div className="card-body" style={{ paddingBottom: 0 }}>
+          <p className="section-title">Productos</p>
         </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              {['Producto', 'Cantidad', 'Precio unit.', 'Subtotal'].map((h, i) => (
-                <th key={h} style={{ textAlign: i > 0 ? 'right' : 'left', padding: '0.75rem 1rem', fontSize: 12, fontWeight: 600, color: '#718096', textTransform: 'uppercase', letterSpacing: '0.05em', background: '#f8f9fa', borderBottom: '1px solid #e2e8f0' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {cotizacion.items?.map((item, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                <td style={{ padding: '0.875rem 1rem', fontWeight: 500 }}>{item.nombreProducto}</td>
-                <td style={{ padding: '0.875rem 1rem', textAlign: 'right', color: '#718096' }}>{item.cantidad}</td>
-                <td style={{ padding: '0.875rem 1rem', textAlign: 'right', color: '#718096' }}>{formatCurrency(item.precioUnitario)}</td>
-                <td style={{ padding: '0.875rem 1rem', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(item.subtotal)}</td>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th style={{ textAlign: 'right' }}>Cantidad</th>
+                <th style={{ textAlign: 'right' }}>Precio unit.</th>
+                <th style={{ textAlign: 'right' }}>Subtotal</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 12, padding: '0.875rem 1rem', borderTop: '1px solid #e2e8f0', background: '#f8f9fa' }}>
-          <span style={{ color: '#718096', fontSize: 13 }}>Total</span>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#2563eb' }}>{formatCurrency(cotizacion.total)}</span>
+            </thead>
+            <tbody>
+              {cotizacion.items?.map((item, i) => (
+                <tr key={i}>
+                  <td style={{ fontWeight: 500 }}>{item.nombreProducto}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{item.cantidad}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{formatCurrency(item.precioUnitario)}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(item.subtotal)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="total-row">
+          <span className="total-label">Total</span>
+          <span className="total-amount">{formatCurrency(cotizacion.total)}</span>
+        </div>
+      </div>
+
+      {/* Tarjetas productos móvil */}
+      <div className="mobile-only" style={{ flexDirection: 'column', gap: 10 }}>
+        <p className="section-title">Productos</p>
+        {cotizacion.items?.map((item, i) => (
+          <div key={i} className="card card-body">
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>{item.nombreProducto}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+              <div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cantidad</div>
+                <div>{item.cantidad}</div>
+              </div>
+              <div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Precio unit.</div>
+                <div>{formatCurrency(item.precioUnitario)}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Subtotal</div>
+                <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{formatCurrency(item.subtotal)}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+        <div className="card card-body" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="total-label">Total</span>
+          <span className="total-amount">{formatCurrency(cotizacion.total)}</span>
         </div>
       </div>
     </div>

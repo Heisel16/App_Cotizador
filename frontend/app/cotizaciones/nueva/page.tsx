@@ -37,9 +37,17 @@ export default function NuevaCotizacionPage() {
     if (!productoSel) return
     const existe = items.find(i => i.productoId === productoSel.id)
     if (existe) {
-      setItems(items.map(i => i.productoId === productoSel.id ? { ...i, cantidad: i.cantidad + cantidad } : i))
+      setItems(items.map(i => i.productoId === productoSel.id
+        ? { ...i, cantidad: i.cantidad + cantidad }
+        : i
+      ))
     } else {
-      setItems([...items, { productoId: productoSel.id, nombreProducto: productoSel.nombre, cantidad, precioUnitario: Number(productoSel.precio) }])
+      setItems([...items, {
+        productoId: productoSel.id,
+        nombreProducto: productoSel.nombre,
+        cantidad,
+        precioUnitario: Number(productoSel.precio)
+      }])
     }
     setProductoSelId('')
     setCantidad(1)
@@ -67,80 +75,103 @@ export default function NuevaCotizacionPage() {
     }
   }
 
-  const inputStyle = { padding: '0.5rem 0.75rem', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 14, width: '100%', outline: 'none' }
-  const labelStyle = { fontSize: 13, fontWeight: 500, marginBottom: 6, display: 'block' }
-
   return (
-    <div style={{ maxWidth: 720 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+    <div style={{ maxWidth: 680 }}>
+      <div className="page-header">
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 600 }}>Nueva cotización</h1>
-          <p style={{ fontSize: 13, color: '#718096', marginTop: 2 }}>Completa los datos del cliente y selecciona los productos</p>
+          <h1 className="page-title">Nueva cotización</h1>
+          <p className="page-subtitle">Completa los datos del cliente y selecciona los productos</p>
         </div>
-        <Link href="/cotizaciones" style={{ padding: '0.5rem 1rem', border: '1px solid #e2e8f0', borderRadius: 8, textDecoration: 'none', fontSize: 14, color: '#1a202c' }}>← Volver</Link>
+        <Link href="/cotizaciones" className="btn btn-outline">← Volver</Link>
       </div>
 
-      {error && <div style={{ background: '#fef2f2', color: '#dc2626', padding: '0.75rem 1rem', borderRadius: 8, marginBottom: '1rem', fontSize: 13 }}>{error}</div>}
+      {error && <div className="error-msg">{error}</div>}
 
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.25rem', marginBottom: '1.25rem' }}>
-        <h2 style={{ fontSize: 13, fontWeight: 600, color: '#718096', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Datos del cliente</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <div>
-            <label style={labelStyle}>Nombre del cliente *</label>
-            <input style={inputStyle} value={cliente} onChange={e => setCliente(e.target.value)} placeholder="Ej. Carlos Pérez" />
-          </div>
-          <div>
-            <label style={labelStyle}>Teléfono</label>
-            <input style={inputStyle} value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="Ej. 300 123 4567" />
-          </div>
-        </div>
-      </div>
-
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.25rem', marginBottom: '1.25rem' }}>
-        <h2 style={{ fontSize: 13, fontWeight: 600, color: '#718096', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Agregar producto</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'end' }}>
-          <div>
-            <label style={labelStyle}>Producto</label>
-            <select style={inputStyle} value={productoSelId} onChange={e => setProductoSelId(e.target.value)}>
-              <option value="">Seleccionar producto...</option>
-              {productos.map(p => (
-                <option key={p.id} value={p.id}>{p.nombre} — {formatCurrency(Number(p.precio))}{p.unidad ? ` / ${p.unidad}` : ''}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label style={labelStyle}>Cantidad</label>
-            <input style={{ ...inputStyle, width: 90 }} type="number" min={1} value={cantidad} onChange={e => setCantidad(Number(e.target.value))} />
-          </div>
-          <button onClick={agregarItem} disabled={!productoSelId} style={{ padding: '0.5rem 1rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: productoSelId ? 'pointer' : 'not-allowed', opacity: productoSelId ? 1 : 0.5 }}>
-            Agregar
-          </button>
-        </div>
-
-        {items.length > 0 && (
-          <div style={{ marginTop: '1.25rem', border: '1px solid #e2e8f0', borderRadius: 8, overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: 8, padding: '0.6rem 1rem', background: '#f8f9fa', fontSize: 12, fontWeight: 600, color: '#718096', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              <span>Producto</span><span>Cant.</span><span>Subtotal</span><span></span>
+      {/* Datos del cliente */}
+      <div className="card" style={{ marginBottom: '1.25rem' }}>
+        <div className="card-body">
+          <p className="section-title">Datos del cliente</p>
+          <div className="grid-2">
+            <div className="form-group">
+              <label className="form-label">Nombre del cliente *</label>
+              <input className="form-input" value={cliente} onChange={e => setCliente(e.target.value)} placeholder="Ej. Carlos Pérez" />
             </div>
-            {items.map(item => (
-              <div key={item.productoId} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: 8, padding: '0.75rem 1rem', borderTop: '1px solid #e2e8f0', alignItems: 'center' }}>
-                <span style={{ fontWeight: 500 }}>{item.nombreProducto}</span>
-                <span style={{ color: '#718096' }}>{item.cantidad}</span>
-                <span style={{ fontWeight: 600 }}>{formatCurrency(item.precioUnitario * item.cantidad)}</span>
-                <button onClick={() => quitarItem(item.productoId)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 16 }}>✕</button>
+            <div className="form-group">
+              <label className="form-label">Teléfono</label>
+              <input className="form-input" value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="Ej. 300 123 4567" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Agregar productos */}
+      <div className="card" style={{ marginBottom: '1.25rem' }}>
+        <div className="card-body">
+          <p className="section-title">Agregar producto</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 8, alignItems: 'end' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Producto</label>
+              <select className="form-select" value={productoSelId} onChange={e => setProductoSelId(e.target.value)}>
+                <option value="">Seleccionar producto...</option>
+                {productos.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.nombre} — {formatCurrency(Number(p.precio))}{p.unidad ? ` / ${p.unidad}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Cant.</label>
+              <input
+                className="form-input"
+                type="number"
+                min={1}
+                value={cantidad}
+                onChange={e => setCantidad(Number(e.target.value))}
+                style={{ width: 80 }}
+              />
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={agregarItem}
+              disabled={!productoSelId}
+              style={{ opacity: productoSelId ? 1 : 0.5 }}
+            >
+              Agregar
+            </button>
+          </div>
+
+          {items.length > 0 && (
+            <div className="items-table">
+              <div className="items-header">
+                <span>Producto</span>
+                <span>Cant.</span>
+                <span>Subtotal</span>
+                <span></span>
               </div>
-            ))}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 12, padding: '0.875rem 1rem', borderTop: '1px solid #e2e8f0', background: '#f8f9fa' }}>
-              <span style={{ color: '#718096', fontSize: 13 }}>Total estimado</span>
-              <span style={{ fontSize: 18, fontWeight: 700, color: '#2563eb' }}>{formatCurrency(total)}</span>
+              {items.map(item => (
+                <div key={item.productoId} className="item-row">
+                  <span style={{ fontWeight: 600 }}>{item.nombreProducto}</span>
+                  <span style={{ color: 'var(--text-muted)' }}>{item.cantidad}</span>
+                  <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{formatCurrency(item.precioUnitario * item.cantidad)}</span>
+                  <button
+                    onClick={() => quitarItem(item.productoId)}
+                    style={{ background: 'none', border: 'none', color: 'var(--red-600)', cursor: 'pointer', fontSize: 16, padding: '0 4px' }}
+                  >✕</button>
+                </div>
+              ))}
+              <div className="total-row">
+                <span className="total-label">Total estimado</span>
+                <span className="total-amount">{formatCurrency(total)}</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-        <Link href="/cotizaciones" style={{ padding: '0.5rem 1rem', border: '1px solid #e2e8f0', borderRadius: 8, textDecoration: 'none', fontSize: 14, color: '#1a202c' }}>Cancelar</Link>
-        <button onClick={handleSubmit} disabled={loading} style={{ padding: '0.5rem 1rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+        <Link href="/cotizaciones" className="btn btn-outline">Cancelar</Link>
+        <button className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
           {loading ? 'Guardando...' : 'Crear cotización'}
         </button>
       </div>

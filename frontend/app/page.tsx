@@ -1,129 +1,119 @@
-'use client';
+'use client'
+import Link from 'next/link'
 
-import PageHeader from '@/components/PageHeader';
-import Card from '@/components/Card';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
-import Link from 'next/link';
+const recentQuotes = [
+  { id: '1', client: 'Empresa ABC', amount: '$5.200', status: 'PENDIENTE', date: '2024-01-15' },
+  { id: '2', client: 'Tech Solutions', amount: '$8.500', status: 'APROBADA', date: '2024-01-14' },
+  { id: '3', client: 'Retail Corp', amount: '$3.200', status: 'RECHAZADA', date: '2024-01-13' },
+]
+
+const badgeClass: Record<string, string> = {
+  PENDIENTE: 'badge-pendiente',
+  APROBADA: 'badge-aprobada',
+  RECHAZADA: 'badge-rechazada',
+  COMPLETADA: 'badge-completada',
+}
 
 export default function Dashboard() {
-  const stats = [
-    { label: 'Total Cotizaciones', value: '24', color: 'primary' },
-    { label: 'Pendientes', value: '8', color: 'warning' },
-    { label: 'Aprobadas', value: '12', color: 'success' },
-    { label: 'Rechazadas', value: '4', color: 'error' },
-  ];
-
-  const recentQuotes = [
-    {
-      id: 1,
-      client: 'Empresa ABC',
-      amount: '$5,200',
-      status: 'Pendiente',
-      date: '2024-01-15',
-    },
-    {
-      id: 2,
-      client: 'Tech Solutions',
-      amount: '$8,500',
-      status: 'Aprobada',
-      date: '2024-01-14',
-    },
-    {
-      id: 3,
-      client: 'Retail Corp',
-      amount: '$3,200',
-      status: 'Rechazada',
-      date: '2024-01-13',
-    },
-  ];
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      'Pendiente': 'warning',
-      'Aprobada': 'success',
-      'Rechazada': 'error',
-    } as const;
-    return variants[status as keyof typeof variants] || 'default';
-  };
-
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Dashboard"
-        subtitle="Bienvenido al sistema de cotizador"
-      />
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} variant="elevated" className="p-6">
-            <p className="text-sm text-gray-600 mb-2">{stat.label}</p>
-            <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-          </Card>
-        ))}
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">Bienvenido al sistema de cotizaciones</p>
+        </div>
       </div>
 
-      {/* Recent Quotes */}
-      <Card className="overflow-hidden">
-        <div className="border-b border-gray-200 p-6">
-          <h2 className="text-lg font-bold text-gray-900">Cotizaciones Recientes</h2>
+      {/* Stats */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-label">Total cotizaciones</div>
+          <div className="stat-value">24</div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Cliente</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Monto</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Estado</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Fecha</th>
-                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentQuotes.map((quote) => (
-                <tr key={quote.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900">{quote.client}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">{quote.amount}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant={getStatusBadge(quote.status)}>{quote.status}</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{quote.date}</td>
-                  <td className="px-6 py-4 text-right">
-                    <Link href={`/cotizaciones/${quote.id}`}>
-                      <Button size="sm" variant="outline">
-                        Ver
-                      </Button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="stat-card">
+          <div className="stat-label">Pendientes</div>
+          <div className="stat-value" style={{ color: 'var(--yellow-600)' }}>8</div>
         </div>
-        <div className="border-t border-gray-200 p-6">
-          <Link href="/cotizaciones">
-            <Button variant="secondary">Ver todas las cotizaciones</Button>
-          </Link>
+        <div className="stat-card">
+          <div className="stat-label">Aprobadas</div>
+          <div className="stat-value" style={{ color: 'var(--green-600)' }}>12</div>
         </div>
-      </Card>
+        <div className="stat-card">
+          <div className="stat-label">Rechazadas</div>
+          <div className="stat-value" style={{ color: 'var(--red-600)' }}>4</div>
+        </div>
+      </div>
 
-      {/* Quick Actions */}
-      <Card className="p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Acciones Rápidas</h2>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/cotizaciones/nueva">
-            <Button className="w-full sm:w-auto">
-              + Nueva Cotización
-            </Button>
-          </Link>
-          <Link href="/productos">
-            <Button variant="outline" className="w-full sm:w-auto">
-              Ver Catálogo
-            </Button>
-          </Link>
+      {/* Cotizaciones recientes */}
+      <div className="card" style={{ marginBottom: '1.25rem' }}>
+        <div className="card-body" style={{ borderBottom: '1px solid var(--border)' }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700 }}>Cotizaciones recientes</h2>
         </div>
-      </Card>
+
+        {/* Tabla desktop */}
+        <div className="desktop-only">
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Monto</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th style={{ textAlign: 'right' }}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentQuotes.map(q => (
+                  <tr key={q.id}>
+                    <td style={{ fontWeight: 500 }}>{q.client}</td>
+                    <td style={{ fontWeight: 600 }}>{q.amount}</td>
+                    <td><span className={`badge ${badgeClass[q.status]}`}>{q.status}</span></td>
+                    <td style={{ color: 'var(--text-muted)' }}>{q.date}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Link href={`/cotizaciones/${q.id}`} className="btn btn-outline btn-sm">Ver</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Tarjetas móvil */}
+        <div className="mobile-only" style={{ flexDirection: 'column', gap: 10, padding: '1rem' }}>
+          {recentQuotes.map(q => (
+            <div key={q.id} className="card card-body">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                <div style={{ fontWeight: 600 }}>{q.client}</div>
+                <span className={`badge ${badgeClass[q.status]}`}>{q.status}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Monto</div>
+                  <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{q.amount}</div>
+                </div>
+                <Link href={`/cotizaciones/${q.id}`} className="btn btn-outline btn-sm">Ver</Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="card-body" style={{ borderTop: '1px solid var(--border)' }}>
+          <Link href="/cotizaciones" className="btn btn-outline">Ver todas las cotizaciones</Link>
+        </div>
+      </div>
+
+      {/* Acciones rápidas */}
+      <div className="card">
+        <div className="card-body">
+          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: '1rem' }}>Acciones rápidas</h2>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <Link href="/cotizaciones/nueva" className="btn btn-primary">+ Nueva cotización</Link>
+            <Link href="/productos" className="btn btn-outline">Ver catálogo</Link>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
