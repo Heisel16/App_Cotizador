@@ -19,7 +19,7 @@ public class ApiApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/api/**")
-						.allowedOrigins("http://localhost:3000")
+						.allowedOrigins("http://localhost:3000","https://app-cotizador-sage.vercel.app/")
 						.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
 						.allowedHeaders("*");
 			}

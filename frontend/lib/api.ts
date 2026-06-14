@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { Producto, Cotizacion, CreateProductoDto, CreateCotizacionDto, EstadoCotizacion } from '@/types'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: 'https://appcotizador-production-f3b0.up.railway.app/api',
   headers: { 'Content-Type': 'application/json' },
 })
 
