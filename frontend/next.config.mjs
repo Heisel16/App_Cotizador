@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',           
+  ...(process.env.BUILD_TARGET === 'capacitor' ? { output: 'export' } : {}),
   trailingSlash: true,
   images: {
-    unoptimized: true         
+    unoptimized: true
   }
 };
 
