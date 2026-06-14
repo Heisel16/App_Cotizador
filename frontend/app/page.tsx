@@ -71,7 +71,7 @@ export default function Dashboard() {
                     <td><span className={`badge ${badgeClass[q.status]}`}>{q.status}</span></td>
                     <td style={{ color: 'var(--text-muted)' }}>{q.date}</td>
                     <td style={{ textAlign: 'right' }}>
-                      <Link href={`/cotizaciones/${q.id}`} className="btn btn-outline btn-sm">Ver</Link>
+                      <Link href={`/cotizaciones/editar?id=${q.id}`} className="btn btn-outline btn-sm">Ver</Link>
                     </td>
                   </tr>
                 ))}

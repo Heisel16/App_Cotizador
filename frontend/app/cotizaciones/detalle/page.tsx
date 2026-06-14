@@ -1,6 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { cotizacionesApi } from '@/lib/api'
 import type { Cotizacion, EstadoCotizacion } from '@/types'
@@ -22,8 +22,9 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleString('es-CO', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-export default function CotizacionDetallePage() {
-  const { id } = useParams<{ id: string }>()
+function CotizacionDetalleContent() {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id') || ''
   const router = useRouter()
   const [cotizacion, setCotizacion] = useState<Cotizacion | null>(null)
   const [loading, setLoading] = useState(true)
@@ -31,6 +32,7 @@ export default function CotizacionDetallePage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (!id) { setError('No se especificó una cotización.'); setLoading(false); return }
     cotizacionesApi.buscarPorId(id)
       .then(setCotizacion)
       .catch(() => setError('No se encontró la cotización.'))
@@ -74,7 +76,6 @@ export default function CotizacionDetallePage() {
 
       {error && <div className="error-msg">{error}</div>}
 
-      {/* Info cliente y estado */}
       <div className="grid-2" style={{ marginBottom: '1.25rem' }}>
         <div className="card">
           <div className="card-body">
@@ -108,7 +109,6 @@ export default function CotizacionDetallePage() {
         </div>
       </div>
 
-      {/* Tabla productos desktop */}
       <div className="card desktop-only">
         <div className="card-body" style={{ paddingBottom: 0 }}>
           <p className="section-title">Productos</p>
@@ -141,7 +141,6 @@ export default function CotizacionDetallePage() {
         </div>
       </div>
 
-      {/* Tarjetas productos móvil */}
       <div className="mobile-only" style={{ flexDirection: 'column', gap: 10 }}>
         <p className="section-title">Productos</p>
         {cotizacion.items?.map((item, i) => (
@@ -169,5 +168,13 @@ export default function CotizacionDetallePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CotizacionDetallePage() {
+  return (
+    <Suspense fallback={<div className="loading">Cargando...</div>}>
+      <CotizacionDetalleContent />
+    </Suspense>
   )
 }

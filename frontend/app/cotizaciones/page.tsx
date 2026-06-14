@@ -141,7 +141,7 @@ export default function CotizacionesPage() {
                       <td style={{ color: 'var(--text-muted)' }}>{formatDate(c.fechaCreacion)}</td>
                       <td>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                          <Link href={`/cotizaciones/${c.id}`} className="btn btn-outline btn-sm">Ver</Link>
+                          <Link href={`/cotizaciones/detalle?id=${c.id}`} className="btn btn-outline btn-sm">Ver</Link>
                           <button className="btn btn-danger btn-sm" onClick={() => handleEliminar(c.id)}>Eliminar</button>
                         </div>
                       </td>

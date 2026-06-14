@@ -1,14 +1,15 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { productosApi } from '@/lib/api'
 import type { Categoria } from '@/types'
 
 const CATEGORIAS: Categoria[] = ['PINTURA', 'BARNIZ', 'MOLDURA', 'ACCESORIO', 'MADERA', 'HERRAMIENTA']
 
-export default function EditarProductoPage() {
-  const { id } = useParams<{ id: string }>()
+function EditarProductoForm() {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id') || ''
   const router = useRouter()
   const [form, setForm] = useState({ nombre: '', descripcion: '', precio: '', categoria: '' as Categoria | '', unidad: '' })
   const [loading, setLoading] = useState(true)
@@ -16,6 +17,7 @@ export default function EditarProductoPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (!id) { setError('No se especificó un producto.'); setLoading(false); return }
     productosApi.buscarPorId(id)
       .then(p => setForm({
         nombre: p.nombre,
@@ -104,5 +106,13 @@ export default function EditarProductoPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function EditarProductoPage() {
+  return (
+    <Suspense fallback={<div className="loading">Cargando...</div>}>
+      <EditarProductoForm />
+    </Suspense>
   )
 }

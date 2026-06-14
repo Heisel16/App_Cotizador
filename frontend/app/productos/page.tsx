@@ -113,7 +113,7 @@ export default function ProductosPage() {
                       <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(Number(p.precio))}</td>
                       <td>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                          <Link href={`/productos/${p.id}`} className="btn btn-outline btn-sm">Editar</Link>
+                          <Link href={`/productos/editar?id=${p.id}`} className="btn btn-outline btn-sm">Editar</Link>
                           <button className="btn btn-danger btn-sm" onClick={() => handleEliminar(p.id)}>Deshabilitar</button>
                         </div>
                       </td>
@@ -151,7 +151,7 @@ export default function ProductosPage() {
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <Link href={`/productos/${p.id}`} className="btn btn-outline btn-sm">Editar</Link>
+                    <Link href={`/productos/editar?id=${p.id}`} className="btn btn-outline btn-sm">Editar</Link>
                     <button className="btn btn-danger btn-sm" onClick={() => handleEliminar(p.id)}>Deshabilitar</button>
                   </div>
                 </div>
